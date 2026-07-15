@@ -2,11 +2,17 @@ ECHO OFF
 CLS
 
 setlocal
-title Android IMG Editor
 
+setlocal enabledelayedexpansion
+title Android IMG Editor
+:: palutenfan123 = Rootdir for supplying imgextractor a better output path 
+:: setlocal enabledelayedexpansion for loops and stuff (like using values in loops)
+set "rundir=%~dp0"
+set "devmode=0" :: normally empty only for developing purposes (palutenfan123)
 color 1F
 echo(
-echo ==================== Android IMG Editor - v1.1 ====================
+:: Palutenfan123=Changed it to 1.2 : )
+echo ==================== Android IMG Editor - v1.2 ====================
 echo ======================== By Noah Domingues ========================
 echo(
 echo --------------- Based on JordanEJ's IMG Editor Tool ---------------
@@ -17,6 +23,8 @@ echo(
 REM -------------------------------
 REM Step 1: Extract bin.zip into the "bin" folder
 REM -------------------------------
+if "%devmode%"=="" (
+    :: palutenfan123 = better when working directly with the git repo
 if exist bin.zip (
     title Android IMG Editor - Extracting...
     echo Extracting files...
@@ -36,11 +44,21 @@ if exist bin.zip (
     pause
     exit /b 1
 )
+) else (
+    set "bin=%rundir%bin\"
+    echo Using preextracted files at : "!bin!" 
+    :: when setlocal EnableDelayedExpansion is set you can use !test! instead of %test% - palutenfan123
+    timeout /t 3 /nobreak
+    goto devend
+)
 
 REM -------------------------------
 REM Step 2: Delete bin.zip after extraction
 REM -------------------------------
 del bin.zip /f
+
+:: Developer ends here : )
+:devend
 title Android IMG Editor
 cls
 
@@ -144,12 +162,18 @@ if not exist editor mkdir editor
 
 if exist system.img (
 echo - Unpacking system.img
-bin\windows\imgextractor system.img editor\system >nul 2>nul
-)
+:: New imgextractor needs full path , palutenfan123
+"!rundir!bin\windows\imgextractor.exe" system.img "!rundir!editor" >>NUL
+) 
 
 set tmp=bin\tmp
-if exist system_file_contexts move /y system_file_contexts editor\  >nul 2>nul
-if exist system_fs_config move /y system_fs_config editor\  >nul 2>nul
+::patched : )
+if exist "!rundir!editor\system\system_file_contexts" move /y "!rundir!editor\system\system_file_contexts" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_fs_config" move /y "!rundir!editor\system\system_fs_config" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_size.txt" move /y "!rundir!editor\system\system_size.txt" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_space.txt" (
+    del /q /s "!rundir!editor\system\system_space.txt"
+)
 if exist system move /y system editor\system2  >nul 2>nul
 
 if exist editor\system (
@@ -180,13 +204,23 @@ if not exist editor mkdir editor
 
 if exist vendor.img (
 echo - Unpacking vendor.img
-bin\windows\imgextractor vendor.img editor\vendor >nul 2>nul
+"!rundir!bin\windows\imgextractor.exe" vendor.img "!rundir!editor" >nul 2>nul
 )
 
 set tmp=bin\tmp
-if exist vendor_file_contexts move /y vendor_file_contexts editor\  >nul 2>nul
-if exist vendor_fs_config move /y vendor_fs_config editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_file_contexts" move /y "!rundir!editor\system\system_file_contexts" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_fs_config" move /y "!rundir!editor\system\system_fs_config" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_size.txt" move /y "!rundir!editor\system\system_size.txt" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_space.txt" (
+    del /q /s "!rundir!editor\system\system_space.txt"
+)
 
+if exist "!rundir!editor\vendor\vendor_file_contexts" move /y "!rundir!editor\vendor\vendor_file_contexts" editor\  >nul 2>nul
+if exist "!rundir!editor\vendor\vendor_fs_config" move /y "!rundir!editor\vendor\vendor_fs_config" editor\  >nul 2>nul
+if exist "!rundir!editor\vendor\vendor_size.txt" move /y "!rundir!editor\vendor\vendor_size.txt" editor\  >nul 2>nul
+if exist "!rundir!editor\vendor\vendor_space.txt" (
+    del /q /s "!rundir!editor\vendor\vendor_space.txt"
+)
 if exist editor\system (
 echo - Unpack Done
 echo.
@@ -215,19 +249,29 @@ if not exist editor mkdir editor
 
 if exist system.img (
 echo - Unpacking system.img
-bin\windows\imgextractor system.img editor\system >nul 2>nul
+"!rundir!bin\windows\imgextractor.exe" system.img "!rundir!editor" >nul 2>nul
 )
 
 if exist vendor.img (
 echo - Unpacking vendor.img
-bin\windows\imgextractor vendor.img editor\vendor >nul 2>nul
+"!rundir!bin\windows\imgextractor.exe" vendor.img "!rundir!editor" >>NUL >nul 2>nul
 )
 
 set tmp=bin\tmp
-if exist system_file_contexts move /y system_file_contexts editor\  >nul 2>nul
-if exist vendor_file_contexts move /y vendor_file_contexts editor\  >nul 2>nul
-if exist system_fs_config move /y system_fs_config editor\  >nul 2>nul
-if exist vendor_fs_config move /y vendor_fs_config editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_file_contexts" move /y "!rundir!editor\system\system_file_contexts" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_fs_config" move /y "!rundir!editor\system\system_fs_config" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_size.txt" move /y "!rundir!editor\system\system_size.txt" editor\  >nul 2>nul
+if exist "!rundir!editor\system\system_space.txt" (
+    del /q /s "!rundir!editor\system\system_space.txt"
+)
+
+if exist "!rundir!editor\vendor\vendor_file_contexts" move /y "!rundir!editor\vendor\vendor_file_contexts" editor\  >nul 2>nul
+if exist "!rundir!editor\vendor\vendor_fs_config" move /y "!rundir!editor\vendor\vendor_fs_config" editor\  >nul 2>nul
+if exist "!rundir!editor\vendor\vendor_size.txt" move /y "!rundir!editor\vendor\vendor_size.txt" editor\  >nul 2>nul
+if exist "!rundir!editor\vendor\vendor_space.txt" (
+    del /q /s "!rundir!editor\vendor\vendor_space.txt"
+)
+
 if exist system move /y system editor\system2  >nul 2>nul
 
 if exist editor\system (
@@ -408,7 +452,7 @@ set /P "=///////////////////////////////////////////////////////////////////////
 ECHO.
 ECHO //////////////////// DISCORD SERVER: https://discord.gg/3zbfaTNN7V ////////////////////
 ECHO.
-set /P "=------------------------------------- VERSION 1.1 -------------------------------------" < NUL & echo/
+set /P "=------------------------------------- VERSION 1.2 -------------------------------------" < NUL & echo/
 ECHO.
 set /P "= --------------- COPYRIGHT (C) NOAH DOMINGUES - SEE LICENSE FOR DETAILS ---------------" < NUL & echo/
 ECHO.
